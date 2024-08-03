@@ -1,5 +1,7 @@
 package com.travelguide.user.auth.security;
 
+import static com.travelguide.user.auth.constants.AuthConstants.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +25,12 @@ public class SecurityConfig {
     http.csrf(ServerHttpSecurity.CsrfSpec::disable)
         .authorizeExchange(
             exchanges ->
-                exchanges.pathMatchers("/user/login").permitAll().anyExchange().authenticated())
+                exchanges
+                    .pathMatchers(
+                        new String[] {USER_LOGIN_URI, VALIDATE_USER_ID_URI, USER_CREATE_URI})
+                    .permitAll()
+                    .anyExchange()
+                    .authenticated())
         .addFilterAt(jwtAuthenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION);
 
     return http.build();

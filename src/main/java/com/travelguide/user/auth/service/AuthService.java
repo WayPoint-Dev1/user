@@ -78,6 +78,7 @@ public class AuthService {
   public Mono<Tuple2<UserDetails, String>> getUserDetails(UserDetails userDetails) {
     return userRepository
         .findByUserId(userDetails.getUserId())
+        .switchIfEmpty(Mono.error(new AuthException(ErrorMessage.LOGIN_FAILED)))
         .flatMap(
             user -> {
               if (StringUtils.equals(
@@ -103,10 +104,19 @@ public class AuthService {
     userDetails.setPassword(encrypt(userDetails.getPassword(), SPECIAL_KEY));
     userDetails.setSecret(
         Base64.getEncoder().encodeToString(keyGenerator.generateKey().getEncoded()));
-    return userRepository
-        .save(convertToUser(userDetails))
-        .map(AuthMapper::convertToUserDetails)
-        .defaultIfEmpty(UserDetails.builder().build());
+    return validateUserId(userDetails)
+        .flatMap(
+            extUserDetail -> {
+              log.info("STATUS :: {}", extUserDetail.getUserIdStatus());
+              if (!StringUtils.equalsIgnoreCase(
+                  extUserDetail.getUserIdStatus(), Status.NOT_AVAILABLE.name())) {
+                return userRepository
+                    .save(convertToUser(userDetails))
+                    .map(AuthMapper::convertToUserDetails)
+                    .defaultIfEmpty(UserDetails.builder().build());
+              }
+              return Mono.error(new AuthException(ErrorMessage.INVALID_UID_EMAIL));
+            });
   }
 
   public Mono<UserDetails> validateUserId(UserDetails userDetails) {
