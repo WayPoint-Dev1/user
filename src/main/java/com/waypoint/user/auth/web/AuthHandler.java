@@ -33,15 +33,12 @@ public class AuthHandler implements HandlerFunction<ServerResponse> {
     return request
         .bodyToMono(UserDTO.class)
         .flatMap(AuthMapper::validateUserSignupRequest)
-        .flatMap(authService::validateUserName)
         .flatMap(authService::userSignup)
         .flatMap(userDTO -> ok().contentType(MediaType.APPLICATION_JSON).bodyValue(userDTO));
   }
 
   public Mono<ServerResponse> handleValidateUserName(ServerRequest request) {
-    return request
-        .bodyToMono(UserDTO.class)
-            .flatMap(AuthMapper::validateUserNameRequest)
+    return AuthMapper.validateUserNameRequest(request.pathVariable("userName"))
         .flatMap(authService::validateUserName)
         .flatMap(userDTO -> ok().contentType(MediaType.APPLICATION_JSON).bodyValue(userDTO));
   }

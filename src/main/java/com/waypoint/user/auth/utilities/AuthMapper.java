@@ -86,10 +86,10 @@ public class AuthMapper {
         : Mono.error(new AuthException(ErrorMessage.MANDATORY_FIELDS_MISSING));
   }
 
-  public static Mono<UserDTO> validateUserNameRequest(UserDTO userDTO) {
-    log.info("validateUserName :: {}", userDTO);
-    return !StringUtils.isEmpty(userDTO.getUserName())
-        ? Mono.just(userDTO)
+  public static Mono<String> validateUserNameRequest(String userName) {
+    log.info("validateUserName :: {}", userName);
+    return !StringUtils.isEmpty(userName)
+        ? Mono.just(userName)
         : Mono.error(new AuthException(ErrorMessage.MANDATORY_FIELDS_MISSING));
   }
 

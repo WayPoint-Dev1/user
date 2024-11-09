@@ -75,21 +75,23 @@ public class AuthService {
     log.info("userSignup :: userDTO :: {}", userDTO);
     userDTO.setPassword(hashPassword(userDTO.getPassword()));
     userDTO.setSecret(Base64.getEncoder().encodeToString(keyGenerator.generateKey().getEncoded()));
-    return userRepository
-        .save(AuthMapper.getUser(userDTO))
-        .switchIfEmpty(Mono.error(new AuthException(ErrorMessage.USER_SIGNUP_FAILED)))
-        .map(AuthMapper::getUserDTO);
+    return validateUserName(userDTO.getUserName())
+        .then(
+            userRepository
+                .save(AuthMapper.getUser(userDTO))
+                .switchIfEmpty(Mono.error(new AuthException(ErrorMessage.USER_SIGNUP_FAILED)))
+                .map(AuthMapper::getUserDTO));
   }
 
-  public Mono<UserDTO> validateUserName(UserDTO userDTO) {
-    log.info("validateUserId :: userDTO :: {}", userDTO);
+  public Mono<String> validateUserName(String userName) {
+    log.info("validateUserId :: userDTO :: {}", userName);
     return userRepository
-        .existsByUserNameAndIsActive(userDTO.getUserName(), true)
+        .existsByUserNameAndIsActive(userName, true)
         .flatMap(
             isPresent ->
                 isPresent
                     ? Mono.error(new AuthException(ErrorMessage.INVALID_USERNAME))
-                    : Mono.just(userDTO));
+                    : Mono.just(userName));
   }
 
   public Mono<UserDTO> resetPassword(UserDTO userDTO) {

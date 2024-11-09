@@ -1,0 +1,449 @@
+openapi: 3.0.3
+info:
+  version: '1.0'
+  title: Swagger-UI
+servers:
+  - url: 'http://localhost:8080'
+tags:
+  - name: Auth
+    description: Operations related to user authentication and authorization
+paths:
+  /signin:
+    post:
+      tags:
+        - Auth
+      summary: User Signin
+      description: ''
+      operationId: post-user-signin
+      requestBody:
+        description: User Credentials
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userName:
+                  type: string
+                  description: Username of the user
+                password:
+                  type: string
+                  description: Password of the user
+                email:
+                  type: string
+                  description: User email
+              required:
+                - userName
+                - password
+              x-examples:
+                Example 1:
+                  userName: atom_1106
+                  password: password123
+            examples:
+              Example 1:
+                value:
+                  userName: atom_1106
+                  password: password123
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+              examples:
+                Example 1:
+                  value:
+                    userName: atom_1106
+                    firstName: Nani
+                    middleName: God
+                    lastName: B
+                    email: nani@gmail.com
+                    countryCode: '+91'
+                    mobileNo: '9876543210'
+                    password: password123
+                    emailVerified: true
+                    mfaEnabled: true
+        '422':
+          description: Unprocessable Entity (WebDAV)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+                  status:
+                    type: string
+                x-examples:
+                  Example 1:
+                    error: INCORRECT_LOGIN_CREDENTIALS
+                    message: INCORRECT USERNAME/PASSWORD
+                    timestamp: '2024-11-08T20:35:53.175472600'
+                    status: '422'
+              examples:
+                Example 1:
+                  value:
+                    error: INCORRECT_LOGIN_CREDENTIALS
+                    message: INCORRECT USERNAME/PASSWORD
+                    timestamp: '2024-11-08T20:35:53.175472600'
+                    status: '422'
+        '500':
+          description: Internal Server Error
+  /signup:
+    post:
+      tags:
+        - Auth
+      summary: User Signup
+      description: Create a new user.
+      operationId: post-user-signup
+      requestBody:
+        description: Post the necessary fields for the API to create a new user.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userName:
+                  type: string
+                firstName:
+                  type: string
+                middleName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                countryCode:
+                  type: string
+                mobileNo:
+                  type: string
+                password:
+                  type: string
+                mfaEnabled:
+                  type: boolean
+              required:
+                - userName
+                - firstName
+                - email
+                - password
+              x-examples:
+                Example 1:
+                  userName: atom_1106
+                  firstName: Nani
+                  middleName: God
+                  lastName: B
+                  email: nani@gmail.com
+                  countryCode: '+91'
+                  mobileNo: '9876543210'
+                  password: password123
+                  mfaEnabled: true
+            examples:
+              Example 1:
+                value:
+                  userName: atom_1106
+                  firstName: Nani
+                  middleName: God
+                  lastName: B
+                  email: nani@gmail.com
+                  countryCode: '+91'
+                  mobileNo: '9876543210'
+                  password: password123
+                  mfaEnabled: true
+      responses:
+        '200':
+          description: User Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+              examples:
+                Example 1:
+                  value:
+                    userName: atom_1106
+                    firstName: Nani
+                    middleName: God
+                    lastName: B
+                    email: nani@gmail.com
+                    countryCode: '+91'
+                    mobileNo: '9876543210'
+                    password: password123
+                    emailVerified: true
+                    mfaEnabled: true
+        '422':
+          description: Unprocessable Entity (WebDAV)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+                  status:
+                    type: string
+                x-examples:
+                  Example 1:
+                    error: INCORRECT_LOGIN_CREDENTIALS
+                    message: INCORRECT USERNAME/PASSWORD
+                    timestamp: '2024-11-08T20:35:53.175472600'
+                    status: '422'
+              examples:
+                Example 1:
+                  value:
+                    error: INVALID_USERNAME
+                    message: PROVIDED USERNAME IS LINKED TO ANOTHER ACCOUNT
+                    timestamp: '2024-11-08T20:57:56.631408300'
+                    status: '422'
+      servers:
+        - url: 'http://localhost:8080'
+  '/val/uname/{userName}':
+    get:
+      tags:
+        - Auth
+      summary: Your GET endpoint
+      operationId: get-val-uname-userName
+      parameters:
+        - name: userName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                Example 1:
+                  value: atom_1106
+        '422':
+          description: Unprocessable Entity (WebDAV)
+          content:
+            application/json:
+              schema:
+                type: object
+              examples:
+                Example 1:
+                  value:
+                    error: INVALID_USERNAME
+                    message: PROVIDED USERNAME IS LINKED TO ANOTHER ACCOUNT
+                    timestamp: '2024-11-09T17:35:06.418917600'
+                    status: '422'
+      servers:
+        - url: 'http://localhost:8080'
+  /send/otp:
+    post:
+      tags:
+        - Auth
+      summary: Your POST endpoint
+      operationId: post-send-otp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userName:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - userName
+                - password
+              x-examples:
+                Example 1:
+                  userName: atom_1106
+                  email: prasad.bhogapurapu1106@gmail.com
+                  password: 11@June@2001
+            examples:
+              Example 1:
+                value:
+                  userName: atom_1106
+                  email: prasad.bhogapurapu1106@gmail.com
+                  password: 11@June@2001
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userName:
+                    type: string
+                  firstName:
+                    type: string
+                  email:
+                    type: string
+                  emailVerified:
+                    type: boolean
+                  mfaEnabled:
+                    type: boolean
+                x-examples:
+                  Example 1:
+                    userName: atom_1106
+                    firstName: Nani
+                    email: prasad.bhogapurapu1106@gmail.com
+                    emailVerified: false
+                    mfaEnabled: false
+              examples:
+                Example 1:
+                  value:
+                    userName: atom_1106
+                    firstName: Nani
+                    email: prasad.bhogapurapu1106@gmail.com
+                    emailVerified: false
+                    mfaEnabled: false
+      servers:
+        - url: 'http://localhost:8080'
+  '/val/otp/{otp}':
+    post:
+      tags:
+        - Auth
+      summary: Your POST endpoint
+      operationId: post-val-otp-otp
+      parameters:
+        - name: otp
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userName:
+                  type: string
+                email:
+                  type: string
+              required:
+                - userName
+              x-examples:
+                Example 1:
+                  userName: atom_1106
+                  email: prasad.bhogapurapu1106@gmail.com
+            examples:
+              Example 1:
+                value:
+                  userName: atom_1106
+                  email: prasad.bhogapurapu1106@gmail.com
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userName:
+                    type: string
+                  firstName:
+                    type: string
+                  email:
+                    type: string
+                  emailVerified:
+                    type: boolean
+                  mfaEnabled:
+                    type: boolean
+                x-examples:
+                  Example 1:
+                    userName: atom_1106
+                    firstName: Nani
+                    email: prasad.bhogapurapu1106@gmail.com
+                    emailVerified: false
+                    mfaEnabled: false
+              examples:
+                Example 1:
+                  value:
+                    userName: atom_1106
+                    firstName: Nani
+                    email: prasad.bhogapurapu1106@gmail.com
+                    emailVerified: false
+                    mfaEnabled: false
+        '422':
+          description: Unprocessable Entity (WebDAV)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+                  status:
+                    type: string
+                x-examples:
+                  Example 1:
+                    error: INVALID_OTP
+                    message: INCORRECT OTP
+                    timestamp: '2024-11-09T17:15:03.808519900'
+                    status: '422'
+              examples:
+                Example 1:
+                  value:
+                    error: INVALID_OTP
+                    message: INCORRECT OTP
+                    timestamp: '2024-11-09T17:15:03.808519900'
+                    status: '422'
+      servers:
+        - url: 'http://localhost:8080'
+components:
+  schemas:
+    UserDTO:
+      type: object
+      description: User Data Transfer Object
+      properties:
+        id:
+          type: string
+        userId:
+          type: integer
+        userName:
+          type: string
+        firstName:
+          type: string
+        middleName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        countryCode:
+          type: string
+        mobileNo:
+          type: string
+        password:
+          type: string
+        emailVerified:
+          type: boolean
+        mfaEnabled:
+          type: boolean
+      x-examples:
+        Example 1:
+          id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+          userId: 11
+          userName: atom_1106
+          firstName: Nani
+          middleName: God
+          lastName: B
+          email: nani@gmail.com
+          countryCode: '+91'
+          mobileNo: '9876543210'
+          password: password123
+          emailVerified: true
+          mfaEnabled: true

@@ -27,7 +27,7 @@ public class HttpRouter {
             USER_SIGNUP_URI,
             RequestPredicates.accept(MediaType.APPLICATION_JSON),
             authHandler::handleUserSignup)
-        .POST(
+        .GET(
             VALIDATE_USER_NAME_URI,
             RequestPredicates.accept(MediaType.APPLICATION_JSON),
             authHandler::handleValidateUserName)
