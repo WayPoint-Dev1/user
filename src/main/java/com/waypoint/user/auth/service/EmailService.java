@@ -1,8 +1,6 @@
 package com.waypoint.user.auth.service;
 
-import static com.waypoint.user.auth.constants.AuthConstants.*;
-
-import com.waypoint.user.auth.exception.AuthException;
+import com.waypoint.user.auth.exception.UserManagementException;
 import com.waypoint.user.auth.exception.ErrorMessage;
 import com.waypoint.user.auth.utilities.AuthMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +10,6 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.ses.SesClient;
-import software.amazon.awssdk.services.ses.model.*;
 
 @Service
 @Slf4j
@@ -50,7 +47,7 @@ public class EmailService {
         .doOnError(
             error -> {
               log.error("Failed to send email: {}", error.getMessage());
-              Mono.error(new AuthException(ErrorMessage.FAILED_TO_SEND_OTP));
+              Mono.error(new UserManagementException(ErrorMessage.FAILED_TO_SEND_OTP));
             });
   }
 

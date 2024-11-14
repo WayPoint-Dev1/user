@@ -1,9 +1,11 @@
 package com.waypoint.user;
 
 import static com.waypoint.user.auth.constants.AuthConstants.*;
+import static com.waypoint.user.auth.constants.UserMappingConstants.CREATE_USER_TRIP_MAPPING_URI;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 import com.waypoint.user.auth.web.AuthHandler;
+import com.waypoint.user.auth.web.UserMappingHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -14,9 +16,11 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 @Configuration
 public class HttpRouter {
   private final AuthHandler authHandler;
+  private final UserMappingHandler userMappingHandler;
 
-  public HttpRouter(AuthHandler authHandler) {
+  public HttpRouter(AuthHandler authHandler, UserMappingHandler userMappingHandler) {
     this.authHandler = authHandler;
+    this.userMappingHandler = userMappingHandler;
   }
 
   @Bean
@@ -43,6 +47,10 @@ public class HttpRouter {
             RESET_PASSWORD_URI,
             RequestPredicates.accept(MediaType.APPLICATION_JSON),
             authHandler::handleResetPassword)
+        .POST(
+            CREATE_USER_TRIP_MAPPING_URI,
+            RequestPredicates.accept(MediaType.APPLICATION_JSON),
+            userMappingHandler)
         .build();
   }
 }

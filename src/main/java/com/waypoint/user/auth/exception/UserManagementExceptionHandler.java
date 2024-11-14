@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import reactor.core.publisher.Mono;
 
 @ControllerAdvice
-public class AuthExceptionHandler {
+public class UserManagementExceptionHandler {
 
-  @ExceptionHandler(AuthException.class)
-  public Mono<ResponseEntity<Map<String, String>>> handleAuthException(AuthException ex) {
+  @ExceptionHandler(UserManagementException.class)
+  public Mono<ResponseEntity<Map<String, String>>> handleAuthException(UserManagementException ex) {
     Map<String, String> errorMap = new HashMap<>();
     errorMap.put("timestamp", LocalDateTime.now().toString());
     errorMap.put("status", String.valueOf(ex.getErrorMessage().getHttpStatusCode()));

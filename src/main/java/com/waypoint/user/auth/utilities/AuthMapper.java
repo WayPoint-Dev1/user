@@ -5,7 +5,7 @@ import static com.waypoint.user.auth.constants.AuthConstants.OTP_EMAIL_SUBJECT;
 
 import com.waypoint.user.auth.domain.dto.UserDTO;
 import com.waypoint.user.auth.domain.entity.User;
-import com.waypoint.user.auth.exception.AuthException;
+import com.waypoint.user.auth.exception.UserManagementException;
 import com.waypoint.user.auth.exception.ErrorMessage;
 import java.time.LocalDateTime;
 import org.apache.commons.lang3.StringUtils;
@@ -74,7 +74,7 @@ public class AuthMapper {
             && !StringUtils.isEmpty(userDTO.getPassword())
             && !StringUtils.isEmpty(userDTO.getFirstName()))
         ? Mono.just(userDTO)
-        : Mono.error(new AuthException(ErrorMessage.MANDATORY_FIELDS_MISSING));
+        : Mono.error(new UserManagementException(ErrorMessage.MANDATORY_FIELDS_MISSING));
   }
 
   public static Mono<UserDTO> validateOtpRequest(UserDTO userDTO) {
@@ -83,21 +83,21 @@ public class AuthMapper {
                 || !StringUtils.isEmpty(userDTO.getEmail()))
             && !StringUtils.isEmpty(userDTO.getPassword()))
         ? Mono.just(userDTO)
-        : Mono.error(new AuthException(ErrorMessage.MANDATORY_FIELDS_MISSING));
+        : Mono.error(new UserManagementException(ErrorMessage.MANDATORY_FIELDS_MISSING));
   }
 
   public static Mono<String> validateUserNameRequest(String userName) {
     log.info("validateUserName :: {}", userName);
     return !StringUtils.isEmpty(userName)
         ? Mono.just(userName)
-        : Mono.error(new AuthException(ErrorMessage.MANDATORY_FIELDS_MISSING));
+        : Mono.error(new UserManagementException(ErrorMessage.MANDATORY_FIELDS_MISSING));
   }
 
   public static Mono<UserDTO> validateCheckOtpRequest(UserDTO userDTO) {
     log.info("validateCheckOtpRequest :: {}", userDTO);
     return (!StringUtils.isEmpty(userDTO.getUserName()) || !StringUtils.isEmpty(userDTO.getEmail()))
         ? Mono.just(userDTO)
-        : Mono.error(new AuthException(ErrorMessage.MANDATORY_FIELDS_MISSING));
+        : Mono.error(new UserManagementException(ErrorMessage.MANDATORY_FIELDS_MISSING));
   }
 
   public static Mono<UserDTO> validateUserSigninRequest(UserDTO userDTO) {
@@ -105,7 +105,7 @@ public class AuthMapper {
                 || !StringUtils.isEmpty(userDTO.getEmail()))
             && !StringUtils.isEmpty(userDTO.getPassword()))
         ? Mono.just(userDTO)
-        : Mono.error(new AuthException(ErrorMessage.MANDATORY_FIELDS_MISSING));
+        : Mono.error(new UserManagementException(ErrorMessage.MANDATORY_FIELDS_MISSING));
   }
 
   public static Mono<UserDTO> validateResetPasswordRequest(UserDTO userDTO) {
@@ -113,6 +113,6 @@ public class AuthMapper {
                 || !StringUtils.isEmpty(userDTO.getEmail()))
             && !StringUtils.isEmpty(userDTO.getPassword()))
         ? Mono.just(userDTO)
-        : Mono.error(new AuthException(ErrorMessage.MANDATORY_FIELDS_MISSING));
+        : Mono.error(new UserManagementException(ErrorMessage.MANDATORY_FIELDS_MISSING));
   }
 }

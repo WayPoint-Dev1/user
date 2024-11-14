@@ -9,26 +9,17 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("user_info")
+@Table("user_trip_map")
 @Getter
 @Setter
 @Builder
 @Entity
-public class User {
+public class UserTripMap {
   @Id private UUID id;
-  private Integer userId;
-  private String userName;
-  private String email;
-  private String firstName;
-  private String middleName;
-  private String lastName;
-  private String countryCode;
-  private String mobileNo;
-  private String hashedPassword;
-  private String secret;
-  private boolean emailVerified;
-  private boolean mfaEnabled;
-  private boolean isActive;
+  private Integer userTripMapId;
+  private UUID userId;
+  private UUID tripId;
+  private Boolean isActive;
   private String createdBy;
   private LocalDateTime createdOn;
   private String updatedBy;

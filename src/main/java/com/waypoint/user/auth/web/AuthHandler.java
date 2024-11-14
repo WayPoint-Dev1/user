@@ -38,7 +38,7 @@ public class AuthHandler implements HandlerFunction<ServerResponse> {
   }
 
   public Mono<ServerResponse> handleValidateUserName(ServerRequest request) {
-    return AuthMapper.validateUserNameRequest(request.pathVariable("userName"))
+    return AuthMapper.validateUserNameRequest(request.pathVariable("username"))
         .flatMap(authService::validateUserName)
         .flatMap(userDTO -> ok().contentType(MediaType.APPLICATION_JSON).bodyValue(userDTO));
   }
