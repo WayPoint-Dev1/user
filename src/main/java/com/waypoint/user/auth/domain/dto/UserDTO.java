@@ -26,6 +26,7 @@ public class UserDTO {
   private String mobileNo;
   private String password;
   @JsonIgnore private String secret;
+  private boolean available;
   private boolean emailVerified;
   private boolean mfaEnabled;
 

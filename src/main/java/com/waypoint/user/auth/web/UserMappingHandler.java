@@ -22,8 +22,18 @@ public class UserMappingHandler implements HandlerFunction<ServerResponse> {
   @Override
   public Mono<ServerResponse> handle(ServerRequest request) {
 
-    return UserMappingMapper.validateCreateUserTripMappingRequest(request)
+    return UserMappingMapper.validateUserTripMappingRequest(request)
         .flatMap(tuple2 -> userMappingService.createUserTripMapping(tuple2.getT1(), tuple2.getT2()))
-        .flatMap(userDTO -> ok().contentType(MediaType.APPLICATION_JSON).bodyValue(userDTO));
+        .flatMap(
+            userTripMapDTO ->
+                ok().contentType(MediaType.APPLICATION_JSON).bodyValue(userTripMapDTO));
+  }
+
+  public Mono<ServerResponse> handleDeleteUserTripMapping(ServerRequest request) {
+    return UserMappingMapper.validateUserTripMappingRequest(request)
+        .flatMap(tuple2 -> userMappingService.deleteUserTripMapping(tuple2.getT1(), tuple2.getT2()))
+        .flatMap(
+            userTripMapDTO ->
+                ok().contentType(MediaType.APPLICATION_JSON).bodyValue(userTripMapDTO));
   }
 }

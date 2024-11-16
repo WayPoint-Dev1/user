@@ -6,7 +6,7 @@ import com.eatthepath.otp.TimeBasedOneTimePasswordGenerator;
 import com.waypoint.user.auth.domain.dto.UserDTO;
 import com.waypoint.user.auth.domain.entity.User;
 import com.waypoint.user.auth.exception.ErrorMessage;
-import com.waypoint.user.auth.exception.UserManagementException;
+import com.waypoint.user.auth.exception.GenericException;
 import com.waypoint.user.auth.repository.UserRepository;
 import com.waypoint.user.auth.utilities.AuthMapper;
 import java.nio.charset.StandardCharsets;
@@ -65,7 +65,7 @@ public class AuthService {
                 // String token = jwtUtil.generateToken(userDTO.getUserId());
                 return Mono.just(user);
               }
-              return Mono.error(new UserManagementException(ErrorMessage.LOGIN_FAILED));
+              return Mono.error(new GenericException(ErrorMessage.LOGIN_FAILED));
             })
         .map(AuthMapper::getUserDTO);
   }
@@ -75,23 +75,23 @@ public class AuthService {
     userDTO.setPassword(hashPassword(userDTO.getPassword()));
     userDTO.setSecret(Base64.getEncoder().encodeToString(keyGenerator.generateKey().getEncoded()));
     return validateUserName(userDTO.getUserName())
+        .flatMap(
+            userDTO1 ->
+                userDTO1.isAvailable()
+                    ? Mono.just(userDTO1)
+                    : Mono.error(new GenericException(ErrorMessage.USERNAME_NOT_AVAILABLE)))
         .then(
             userRepository
                 .save(AuthMapper.getUser(userDTO))
-                .switchIfEmpty(
-                    Mono.error(new UserManagementException(ErrorMessage.SIGNUP_FAILED)))
+                .switchIfEmpty(Mono.error(new GenericException(ErrorMessage.SIGNUP_FAILED)))
                 .map(AuthMapper::getUserDTO));
   }
 
-  public Mono<String> validateUserName(String userName) {
+  public Mono<UserDTO> validateUserName(String userName) {
     log.info("validateUserId :: userDTO :: {}", userName);
     return userRepository
         .existsByUserNameAndIsActive(userName, true)
-        .flatMap(
-            isPresent ->
-                isPresent
-                    ? Mono.error(new UserManagementException(ErrorMessage.USERNAME_NOT_AVAILABLE))
-                    : Mono.just(userName));
+        .map(isPresent -> UserDTO.builder().userName(userName).available(!isPresent).build());
   }
 
   public Mono<UserDTO> resetPassword(UserDTO userDTO) {
@@ -105,7 +105,7 @@ public class AuthService {
                 user.setHashedPassword(hashPassword(userDTO.getPassword()));
                 return Mono.just(user);
               }
-              return Mono.error(new UserManagementException(ErrorMessage.INVALID_PASSWORD));
+              return Mono.error(new GenericException(ErrorMessage.INVALID_PASSWORD));
             })
         .flatMap(userRepository::save)
         .map(AuthMapper::getUserDTO);
@@ -113,21 +113,21 @@ public class AuthService {
 
   public Mono<User> getUserDetails(UserDTO userDTO) {
     log.info("getUserDetails :: userDTO :: {}", userDTO);
-    if (StringUtils.isNotBlank(userDTO.getUserName()) && StringUtils.isNotBlank(userDTO.getEmail())) {
+    if (StringUtils.isNotBlank(userDTO.getUserName())
+        && StringUtils.isNotBlank(userDTO.getEmail())) {
       return userRepository
           .findByUserNameAndEmailAndIsActive(userDTO.getUserName(), userDTO.getEmail(), true)
-          .switchIfEmpty(Mono.error(new UserManagementException(ErrorMessage.USERNAME_EMAIL_NOT_FOUND)));
-    }
-    else if (StringUtils.isNotBlank(userDTO.getUserName())) {
+          .switchIfEmpty(Mono.error(new GenericException(ErrorMessage.USERNAME_EMAIL_NOT_FOUND)));
+    } else if (StringUtils.isNotBlank(userDTO.getUserName())) {
       return userRepository
           .findByUserNameAndIsActive(userDTO.getUserName(), true)
-          .switchIfEmpty(Mono.error(new UserManagementException(ErrorMessage.USERNAME_NOT_FOUND)));
+          .switchIfEmpty(Mono.error(new GenericException(ErrorMessage.USERNAME_NOT_FOUND)));
     } else if (StringUtils.isNotBlank(userDTO.getEmail())) {
       return userRepository
           .findByEmailAndIsActive(userDTO.getEmail(), true)
-          .switchIfEmpty(Mono.error(new UserManagementException(ErrorMessage.EMAIL_NOT_FOUND)));
+          .switchIfEmpty(Mono.error(new GenericException(ErrorMessage.EMAIL_NOT_FOUND)));
     }
-    return Mono.error(new UserManagementException(ErrorMessage.MANDATORY_FIELDS_MISSING));
+    return Mono.error(new GenericException(ErrorMessage.MANDATORY_FIELDS_MISSING));
   }
 
   public Mono<UserDTO> sendOTP(UserDTO userDTO) {
@@ -141,7 +141,7 @@ public class AuthService {
     } catch (Exception e) {
       log.info("sendOTP :: Exception :: {}", e);
     }
-    return Mono.error(new UserManagementException(ErrorMessage.FAILED_TO_SEND_OTP));
+    return Mono.error(new GenericException(ErrorMessage.FAILED_TO_SEND_OTP));
   }
 
   public Mono<UserDTO> validateOTP(UserDTO userDTO, String otp) {
@@ -159,7 +159,7 @@ public class AuthService {
               } catch (Exception e) {
                 log.info("validateOTP :: Exception :: {}", e);
               }
-              return Mono.error(new UserManagementException(ErrorMessage.INVALID_OTP));
+              return Mono.error(new GenericException(ErrorMessage.INVALID_OTP));
             });
   }
 }

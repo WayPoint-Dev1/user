@@ -2,7 +2,7 @@ package com.waypoint.user.auth.service;
 
 import com.waypoint.user.auth.domain.dto.UserTripMapDTO;
 import com.waypoint.user.auth.exception.ErrorMessage;
-import com.waypoint.user.auth.exception.UserManagementException;
+import com.waypoint.user.auth.exception.GenericException;
 import com.waypoint.user.auth.repository.UserRepository;
 import com.waypoint.user.auth.repository.UserTripMapRepository;
 import com.waypoint.user.auth.utilities.UserMappingMapper;
@@ -27,7 +27,7 @@ public class UserMappingService {
     log.info("createUserTripMapping :: username :: {} :: tripId :: {}", username, tripId);
     return userRepository
         .findByUserNameAndIsActive(username, true)
-        .switchIfEmpty(Mono.error(new UserManagementException(ErrorMessage.USERNAME_NOT_FOUND)))
+        .switchIfEmpty(Mono.error(new GenericException(ErrorMessage.USERNAME_NOT_FOUND)))
         .flatMap(
             user ->
                 userTripMapRepository
@@ -40,8 +40,26 @@ public class UserMappingService {
                             .onErrorResume(
                                 throwable ->
                                     Mono.error(
-                                        new UserManagementException(
+                                        new GenericException(
                                             ErrorMessage.USER_TRIP_MAPPING_FAILED))))
                     .map(UserMappingMapper::getUserTripMapDTO));
+  }
+
+  public Mono<UserTripMapDTO> deleteUserTripMapping(String username, UUID tripId) {
+    log.info("deleteUserTripMapping :: username :: {} :: tripId :: {}", username, tripId);
+    return userRepository
+        .findByUserNameAndIsActive(username, true)
+        .switchIfEmpty(Mono.error(new GenericException(ErrorMessage.USERNAME_NOT_FOUND)))
+        .flatMap(
+            user ->
+                userTripMapRepository
+                    .findByUserIdAndTripIdAndIsActive(user.getId(), tripId, true)
+                    .switchIfEmpty(
+                        Mono.error(new GenericException(ErrorMessage.USER_TRIP_MAPPING_NOT_FOUND)))
+                    .flatMap(
+                        userTripMap ->
+                            userTripMapRepository
+                                .save(UserMappingMapper.deleteUserTripMap(userTripMap))
+                                .map(UserMappingMapper::getUserTripMapDTO)));
   }
 }

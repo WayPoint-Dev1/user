@@ -1,6 +1,6 @@
 package com.waypoint.user.auth.service;
 
-import com.waypoint.user.auth.exception.UserManagementException;
+import com.waypoint.user.auth.exception.GenericException;
 import com.waypoint.user.auth.exception.ErrorMessage;
 import com.waypoint.user.auth.utilities.AuthMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +47,7 @@ public class EmailService {
         .doOnError(
             error -> {
               log.error("Failed to send email: {}", error.getMessage());
-              Mono.error(new UserManagementException(ErrorMessage.FAILED_TO_SEND_OTP));
+              Mono.error(new GenericException(ErrorMessage.FAILED_TO_SEND_OTP));
             });
   }
 
